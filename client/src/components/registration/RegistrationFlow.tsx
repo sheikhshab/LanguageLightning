@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check, Shield } from "lucide-react";
 import PinInput from "@/components/shared/PinInput";
 import { useAuth } from "@/contexts/AuthContext";
 
