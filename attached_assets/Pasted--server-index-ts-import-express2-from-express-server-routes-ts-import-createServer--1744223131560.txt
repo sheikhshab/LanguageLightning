@@ -1,0 +1,428 @@
+// server/index.ts
+import express2 from "express";
+
+// server/routes.ts
+import { createServer } from "http";
+
+// server/storage.ts
+var MemStorage = class {
+  users;
+  transactions;
+  userCurrentId;
+  transactionCurrentId;
+  constructor() {
+    this.users = /* @__PURE__ */ new Map();
+    this.transactions = /* @__PURE__ */ new Map();
+    this.userCurrentId = 1;
+    this.transactionCurrentId = 1;
+  }
+  async getUser(id) {
+    return this.users.get(id);
+  }
+  async getUserByUsername(username) {
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username
+    );
+  }
+  async getUserByPhone(phoneNumber) {
+    return Array.from(this.users.values()).find(
+      (user) => user.phoneNumber === phoneNumber
+    );
+  }
+  async createUser(insertUser) {
+    const id = this.userCurrentId++;
+    const now = /* @__PURE__ */ new Date();
+    const user = {
+      ...insertUser,
+      id,
+      balance: "0",
+      createdAt: now
+    };
+    this.users.set(id, user);
+    return user;
+  }
+  async updateUser(id, updateData) {
+    const user = this.users.get(id);
+    if (!user) return void 0;
+    const updatedUser = { ...user, ...updateData };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+  async getTransaction(id) {
+    return this.transactions.get(id);
+  }
+  async getUserTransactions(userId) {
+    return Array.from(this.transactions.values()).filter(
+      (transaction) => transaction.userId === userId
+    );
+  }
+  async createTransaction(insertTransaction) {
+    const id = this.transactionCurrentId++;
+    const now = /* @__PURE__ */ new Date();
+    const transaction = { ...insertTransaction, id, createdAt: now };
+    this.transactions.set(id, transaction);
+    return transaction;
+  }
+  async updateTransaction(id, updateData) {
+    const transaction = this.transactions.get(id);
+    if (!transaction) return void 0;
+    const updatedTransaction = { ...transaction, ...updateData };
+    this.transactions.set(id, updatedTransaction);
+    return updatedTransaction;
+  }
+};
+var storage = new MemStorage();
+
+// shared/schema.ts
+import { pgTable, text, serial, integer, boolean, timestamp, decimal } from "drizzle-orm/pg-core";
+import { createInsertSchema } from "drizzle-zod";
+var users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  phoneNumber: text("phone_number").notNull().unique(),
+  fullName: text("full_name").notNull(),
+  email: text("email"),
+  pin: text("pin").notNull(),
+  enableBiometric: boolean("enable_biometric").default(false),
+  balance: decimal("balance", { precision: 10, scale: 2 }).default("0").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+var transactions = pgTable("transactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  type: text("type").notNull(),
+  // "send" | "receive" | "transfer"
+  amount: decimal("amount", { precision: 10, scale: 2 }).notNull(),
+  fee: decimal("fee", { precision: 10, scale: 2 }).default("0").notNull(),
+  senderInfo: text("sender_info"),
+  receiverInfo: text("receiver_info"),
+  paymentMethod: text("payment_method"),
+  // "nfc" | "ussd"
+  status: text("status").notNull(),
+  // "completed" | "pending" | "failed"
+  offlineSync: boolean("offline_sync").default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull()
+});
+var insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+  balance: true
+});
+var insertTransactionSchema = createInsertSchema(transactions).omit({
+  id: true,
+  createdAt: true
+});
+
+// server/routes.ts
+import { z } from "zod";
+import { ZodError } from "zod";
+var loginSchema = z.object({
+  username: z.string(),
+  password: z.string()
+});
+var updateBalanceSchema = z.object({
+  userId: z.number(),
+  amount: z.string()
+});
+async function registerRoutes(app2) {
+  app2.post("/api/auth/register", async (req, res) => {
+    try {
+      const userData = insertUserSchema.parse(req.body);
+      const existingPhone = await storage.getUserByPhone(userData.phoneNumber);
+      if (existingPhone) {
+        return res.status(400).json({ message: "Phone number already registered" });
+      }
+      const existingUsername = await storage.getUserByUsername(userData.username);
+      if (existingUsername) {
+        return res.status(400).json({ message: "Username already taken" });
+      }
+      const user = await storage.createUser(userData);
+      const { password, ...userWithoutPassword } = user;
+      res.status(201).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid input data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Server error during registration" });
+      }
+    }
+  });
+  app2.post("/api/auth/login", async (req, res) => {
+    try {
+      const credentials = loginSchema.parse(req.body);
+      const user = await storage.getUserByUsername(credentials.username);
+      if (!user || user.password !== credentials.password) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      const { password, ...userWithoutPassword } = user;
+      res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid input data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Server error during login" });
+      }
+    }
+  });
+  app2.get("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const { password, ...userWithoutPassword } = user;
+      res.status(200).json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Server error fetching user" });
+    }
+  });
+  app2.post("/api/balance/update", async (req, res) => {
+    try {
+      const data = updateBalanceSchema.parse(req.body);
+      const user = await storage.getUser(data.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const currentBalance = parseFloat(user.balance);
+      const newAmount = parseFloat(data.amount);
+      const updatedBalance = (currentBalance + newAmount).toFixed(2);
+      const updatedUser = await storage.updateUser(data.userId, {
+        balance: updatedBalance
+      });
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update balance" });
+      }
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.status(200).json({ balance: updatedUser.balance });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid input data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Server error updating balance" });
+      }
+    }
+  });
+  app2.post("/api/transactions", async (req, res) => {
+    try {
+      const transactionData = insertTransactionSchema.parse(req.body);
+      const user = await storage.getUser(transactionData.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const transactionAmount = parseFloat(transactionData.amount);
+      const feeAmount = (transactionAmount * 5e-3).toFixed(2);
+      transactionData.fee = feeAmount;
+      const transaction = await storage.createTransaction(transactionData);
+      let balanceChange = 0;
+      if (transactionData.type === "receive") {
+        balanceChange = transactionAmount - parseFloat(feeAmount);
+      } else if (transactionData.type === "send") {
+        balanceChange = -(transactionAmount + parseFloat(feeAmount));
+      }
+      const currentBalance = parseFloat(user.balance);
+      const newBalance = (currentBalance + balanceChange).toFixed(2);
+      await storage.updateUser(transactionData.userId, {
+        balance: newBalance
+      });
+      res.status(201).json(transaction);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid input data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Server error creating transaction" });
+      }
+    }
+  });
+  app2.get("/api/transactions/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const transactions2 = await storage.getUserTransactions(userId);
+      res.status(200).json(transactions2);
+    } catch (error) {
+      res.status(500).json({ message: "Server error fetching transactions" });
+    }
+  });
+  app2.post("/api/ussd/generate", async (req, res) => {
+    try {
+      const { userId, amount } = req.body;
+      if (!userId || !amount) {
+        return res.status(400).json({ message: "User ID and amount are required" });
+      }
+      const user = await storage.getUser(parseInt(userId));
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      const ussdCode = `*123*${Math.floor(1e5 + Math.random() * 9e5)}#`;
+      res.status(200).json({
+        ussdCode,
+        amount,
+        expiresIn: "5 minutes"
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Server error generating USSD code" });
+    }
+  });
+  const httpServer = createServer(app2);
+  return httpServer;
+}
+
+// server/vite.ts
+import express from "express";
+import fs from "fs";
+import path2 from "path";
+import { createServer as createViteServer, createLogger } from "vite";
+
+// vite.config.ts
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import themePlugin from "@replit/vite-plugin-shadcn-theme-json";
+import path from "path";
+import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+var vite_config_default = defineConfig({
+  plugins: [
+    react(),
+    runtimeErrorOverlay(),
+    themePlugin(),
+    ...process.env.NODE_ENV !== "production" && process.env.REPL_ID !== void 0 ? [
+      await import("@replit/vite-plugin-cartographer").then(
+        (m) => m.cartographer()
+      )
+    ] : []
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets")
+    }
+  },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true
+  }
+});
+
+// server/vite.ts
+import { nanoid } from "nanoid";
+var viteLogger = createLogger();
+function log(message, source = "express") {
+  const formattedTime = (/* @__PURE__ */ new Date()).toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  });
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+async function setupVite(app2, server) {
+  const serverOptions = {
+    middlewareMode: true,
+    hmr: { server },
+    allowedHosts: true
+  };
+  const vite = await createViteServer({
+    ...vite_config_default,
+    configFile: false,
+    customLogger: {
+      ...viteLogger,
+      error: (msg, options) => {
+        viteLogger.error(msg, options);
+        process.exit(1);
+      }
+    },
+    server: serverOptions,
+    appType: "custom"
+  });
+  app2.use(vite.middlewares);
+  app2.use("*", async (req, res, next) => {
+    const url = req.originalUrl;
+    try {
+      const clientTemplate = path2.resolve(
+        import.meta.dirname,
+        "..",
+        "client",
+        "index.html"
+      );
+      let template = await fs.promises.readFile(clientTemplate, "utf-8");
+      template = template.replace(
+        `src="/src/main.tsx"`,
+        `src="/src/main.tsx?v=${nanoid()}"`
+      );
+      const page = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+    } catch (e) {
+      vite.ssrFixStacktrace(e);
+      next(e);
+    }
+  });
+}
+function serveStatic(app2) {
+  const distPath = path2.resolve(import.meta.dirname, "public");
+  if (!fs.existsSync(distPath)) {
+    throw new Error(
+      `Could not find the build directory: ${distPath}, make sure to build the client first`
+    );
+  }
+  app2.use(express.static(distPath));
+  app2.use("*", (_req, res) => {
+    res.sendFile(path2.resolve(distPath, "index.html"));
+  });
+}
+
+// server/index.ts
+var app = express2();
+app.use(express2.json());
+app.use(express2.urlencoded({ extended: false }));
+app.use((req, res, next) => {
+  const start = Date.now();
+  const path3 = req.path;
+  let capturedJsonResponse = void 0;
+  const originalResJson = res.json;
+  res.json = function(bodyJson, ...args) {
+    capturedJsonResponse = bodyJson;
+    return originalResJson.apply(res, [bodyJson, ...args]);
+  };
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    if (path3.startsWith("/api")) {
+      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) {
+        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      }
+      if (logLine.length > 80) {
+        logLine = logLine.slice(0, 79) + "\u2026";
+      }
+      log(logLine);
+    }
+  });
+  next();
+});
+(async () => {
+  const server = await registerRoutes(app);
+  app.use((err, _req, res, _next) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Internal Server Error";
+    res.status(status).json({ message });
+    throw err;
+  });
+  if (app.get("env") === "development") {
+    await setupVite(app, server);
+  } else {
+    serveStatic(app);
+  }
+  const port = 5e3;
+  server.listen({
+    port,
+    host: "0.0.0.0",
+    reusePort: true
+  }, () => {
+    log(`serving on port ${port}`);
+  });
+})();
