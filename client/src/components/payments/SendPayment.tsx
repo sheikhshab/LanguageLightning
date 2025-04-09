@@ -1,29 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { usePayment } from "@/contexts/PaymentContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Send, Loader2, Check, X } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Send, Loader2, Check, X, Smartphone, Users, AlertCircle } from "lucide-react";
 import BottomNavigation from "@/components/shared/BottomNavigation";
 import OfflineBanner from "@/components/shared/OfflineBanner";
 import PinInput from "@/components/shared/PinInput";
 import SecurityBadge from "@/components/shared/SecurityBadge";
 import { formatCurrency } from "@/lib/paymentUtils";
+import { checkNfcSupport, initiateNfcPayment, getNfcPositioningGuide, getNfcInstructions, NfcStatus } from "@/lib/nfcUtils";
 
 export const SendPayment: React.FC = () => {
   const [_, setLocation] = useLocation();
-  const { createTransaction, isLoading } = usePayment();
+  const { createTransaction, simulateNfcPayment, isLoading } = usePayment();
   const { user } = useAuth();
   
-  const [step, setStep] = useState<"details" | "confirm" | "pin" | "result">("details");
+  const [step, setStep] = useState<"details" | "confirm" | "pin" | "result" | "nfc">("details");
   const [amount, setAmount] = useState<string>("");
   const [receiverInfo, setReceiverInfo] = useState<string>("");
   const [note, setNote] = useState<string>("");
   const [pin, setPin] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [transactionSuccess, setTransactionSuccess] = useState<boolean>(false);
+  const [paymentMethod, setPaymentMethod] = useState<"transfer" | "nfc">("transfer");
+  const [nfcSupported, setNfcSupported] = useState<boolean | null>(null);
+  const [nfcStatus, setNfcStatus] = useState<NfcStatus>("inactive");
+  
+  // Check if device supports NFC when component mounts
+  useEffect(() => {
+    const checkNfc = async () => {
+      try {
+        const supported = await checkNfcSupport();
+        setNfcSupported(supported);
+      } catch (error) {
+        console.error("Failed to check NFC support:", error);
+        setNfcSupported(false);
+      }
+    };
+    
+    checkNfc();
+  }, []);
   
   const handleNext = () => {
     if (step === "details") {
@@ -71,6 +91,11 @@ export const SendPayment: React.FC = () => {
     setError(null);
     
     try {
+      if (paymentMethod === "nfc") {
+        setStep("nfc");
+        return;
+      }
+      
       const amountValue = parseFloat(amount);
       const transaction = await createTransaction({
         type: "send",
@@ -93,6 +118,40 @@ export const SendPayment: React.FC = () => {
     setStep("result");
   };
   
+  const handleNfcPayment = async () => {
+    setNfcStatus("inactive");
+    setError(null);
+    
+    try {
+      // First update NFC status through callbacks
+      const result = await initiateNfcPayment(
+        { amount: parseFloat(amount), receiverName: receiverInfo },
+        (status) => setNfcStatus(status)
+      );
+      
+      // If NFC connection was successful, process the transaction
+      if (result) {
+        const success = await simulateNfcPayment(parseFloat(amount), receiverInfo);
+        setTransactionSuccess(success);
+        
+        if (!success) {
+          setError("Transaction was initiated but could not be completed");
+        }
+      } else {
+        setTransactionSuccess(false);
+        setError("Could not establish NFC connection");
+      }
+      
+      // Go to result screen
+      setStep("result");
+    } catch (error) {
+      console.error("NFC payment error:", error);
+      setTransactionSuccess(false);
+      setError("An error occurred during the NFC payment");
+      setStep("result");
+    }
+  };
+  
   const goBack = () => {
     if (step === "details") {
       setLocation("/dashboard");
@@ -100,6 +159,8 @@ export const SendPayment: React.FC = () => {
       setStep("details");
     } else if (step === "pin") {
       setStep("confirm");
+    } else if (step === "nfc") {
+      setStep("pin");
     } else if (step === "result") {
       if (transactionSuccess) {
         setLocation("/dashboard");
@@ -179,6 +240,40 @@ export const SendPayment: React.FC = () => {
                   onChange={(e) => setNote(e.target.value)}
                 />
               </div>
+              
+              {nfcSupported && (
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Payment Method
+                  </label>
+                  <Tabs 
+                    defaultValue="transfer" 
+                    value={paymentMethod}
+                    onValueChange={(value) => setPaymentMethod(value as "transfer" | "nfc")}
+                    className="w-full"
+                  >
+                    <TabsList className="grid w-full grid-cols-2">
+                      <TabsTrigger value="transfer" className="flex items-center">
+                        <Users className="w-4 h-4 mr-2" />
+                        Bank/Account
+                      </TabsTrigger>
+                      <TabsTrigger value="nfc" className="flex items-center">
+                        <Smartphone className="w-4 h-4 mr-2" />
+                        NFC Payment
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
+                  
+                  {paymentMethod === "nfc" && (
+                    <div className="mt-3 bg-blue-50 p-3 rounded-md text-sm text-blue-700">
+                      <div className="flex items-start">
+                        <AlertCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
+                        <p>NFC payment requires devices to be physically close. Tap the recipient's device to complete the payment.</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             
             <Button 
@@ -215,6 +310,22 @@ export const SendPayment: React.FC = () => {
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Recipient</div>
                     <div className="font-semibold">{receiverInfo}</div>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-neutral-100">
+                    <div className="text-neutral-600">Payment Method</div>
+                    <div className="font-semibold flex items-center">
+                      {paymentMethod === "nfc" ? (
+                        <>
+                          <Smartphone className="w-4 h-4 mr-1" />
+                          NFC Payment
+                        </>
+                      ) : (
+                        <>
+                          <Users className="w-4 h-4 mr-1" />
+                          Bank/Account Transfer
+                        </>
+                      )}
+                    </div>
                   </div>
                   {note && (
                     <div className="flex justify-between py-2">
@@ -285,6 +396,92 @@ export const SendPayment: React.FC = () => {
                 "Authorize Payment"
               )}
             </Button>
+          </div>
+        )}
+        
+        {step === "nfc" && (
+          <div>
+            <h2 className="text-xl font-semibold mb-2">NFC Payment</h2>
+            <p className="text-neutral-600 mb-6">
+              Hold your phone close to the recipient's device
+            </p>
+            
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-blue-700 font-medium">Transaction Amount</div>
+                <div className="text-blue-700 font-bold">{formatCurrency(parseFloat(amount))}</div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-blue-700 font-medium">Recipient</div>
+                <div className="text-blue-700 font-medium">{receiverInfo}</div>
+              </div>
+            </div>
+            
+            <div className="mb-6 text-center">
+              <div className="mb-4">
+                <div dangerouslySetInnerHTML={{ __html: getNfcPositioningGuide() }} />
+              </div>
+              
+              <div className="mt-6 relative h-10">
+                {nfcStatus === "scanning" && (
+                  <div className="animate-pulse text-blue-600 flex items-center justify-center">
+                    <Smartphone className="mr-2 h-5 w-5" />
+                    Scanning for device...
+                  </div>
+                )}
+                
+                {nfcStatus === "connecting" && (
+                  <div className="text-amber-600 flex items-center justify-center">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Connecting to device...
+                  </div>
+                )}
+                
+                {nfcStatus === "processing" && (
+                  <div className="text-emerald-600 flex items-center justify-center">
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Processing payment...
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="space-y-2 mb-6">
+              <h3 className="text-sm font-medium text-neutral-700">Instructions:</h3>
+              <ul className="space-y-2">
+                {getNfcInstructions().map((instruction, index) => (
+                  <li key={index} className="flex items-start text-sm text-neutral-600">
+                    <span className="bg-blue-100 text-blue-800 rounded-full h-5 w-5 flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">
+                      {index + 1}
+                    </span>
+                    {instruction}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <Button 
+                variant="outline" 
+                onClick={goBack}
+              >
+                Cancel
+              </Button>
+              <Button 
+                className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                onClick={handleNfcPayment}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  "Start NFC Payment"
+                )}
+              </Button>
+            </div>
           </div>
         )}
         
