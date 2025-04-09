@@ -14,12 +14,12 @@ export const calculateFee = (amount: number, feePercentage: number = 0.5): numbe
 /**
  * Formats a currency amount
  * @param amount The amount to format
- * @param currency The currency symbol (default $)
+ * @param currency The currency symbol (default PKR)
  * @returns Formatted currency string
  */
-export const formatCurrency = (amount: number | string, currency: string = "$"): string => {
+export const formatCurrency = (amount: number | string, currency: string = "PKR"): string => {
   const numAmount = typeof amount === "string" ? parseFloat(amount) : amount;
-  return `${currency}${numAmount.toFixed(2)}`;
+  return `${currency} ${numAmount.toFixed(2)}`;
 };
 
 /**

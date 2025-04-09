@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import BottomNavigation from "@/components/shared/BottomNavigation";
 import OfflineBanner from "@/components/shared/OfflineBanner";
+import { formatCurrency } from "@/lib/paymentUtils";
 import { 
   CreditCard, 
   Send, 
@@ -63,7 +64,7 @@ export const Dashboard: React.FC = () => {
           <p className="text-sm text-white/80">Current Balance</p>
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold">
-              ${parseFloat(user?.balance || "0").toFixed(2)}
+              {formatCurrency(parseFloat(user?.balance || "0"))}
             </div>
             <div className="flex gap-1 items-center">
               <Badge variant="outline" className="bg-white/20 text-white border-0">
@@ -167,7 +168,7 @@ export const Dashboard: React.FC = () => {
                     <div className={`font-semibold ${
                       transaction.type === "receive" ? "text-emerald-600" : "text-blue-600"
                     }`}>
-                      {transaction.type === "receive" ? "+" : "-"}${parseFloat(transaction.amount).toFixed(2)}
+                      {transaction.type === "receive" ? "+" : "-"}{formatCurrency(parseFloat(transaction.amount))}
                     </div>
                   </div>
                 ))}
@@ -191,10 +192,9 @@ export const Dashboard: React.FC = () => {
             <CardContent className="p-4">
               <p className="text-sm text-neutral-500 mb-1">Payments Received</p>
               <p className="text-xl font-semibold">
-                ${transactions
+                {formatCurrency(transactions
                   .filter(t => t.type === "receive")
-                  .reduce((sum, t) => sum + parseFloat(t.amount), 0)
-                  .toFixed(2)}
+                  .reduce((sum, t) => sum + parseFloat(t.amount), 0))}
               </p>
             </CardContent>
           </Card>
@@ -202,10 +202,9 @@ export const Dashboard: React.FC = () => {
             <CardContent className="p-4">
               <p className="text-sm text-neutral-500 mb-1">Payments Sent</p>
               <p className="text-xl font-semibold">
-                ${transactions
+                {formatCurrency(transactions
                   .filter(t => t.type === "send")
-                  .reduce((sum, t) => sum + parseFloat(t.amount), 0)
-                  .toFixed(2)}
+                  .reduce((sum, t) => sum + parseFloat(t.amount), 0))}
               </p>
             </CardContent>
           </Card>

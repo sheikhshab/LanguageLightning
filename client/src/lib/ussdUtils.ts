@@ -85,7 +85,7 @@ export const generateUssdInstructions = (
   return [
     `Dial ${ussdCode} on your phone`,
     `Select option 1 to pay`,
-    `Enter amount: $${formattedAmount}`,
+    `Enter amount: PKR ${formattedAmount}`,
     `Confirm payment with your PIN`
   ];
 };

@@ -9,6 +9,7 @@ import { ArrowLeft, Smartphone, Phone, PhoneCall, Check, Loader2 } from "lucide-
 import BottomNavigation from "@/components/shared/BottomNavigation";
 import SecurityBadge from "@/components/shared/SecurityBadge";
 import OfflineBanner from "@/components/shared/OfflineBanner";
+import { formatCurrency } from "@/lib/paymentUtils";
 
 export const ReceivePayment: React.FC = () => {
   const [_, setLocation] = useLocation();
@@ -92,7 +93,7 @@ export const ReceivePayment: React.FC = () => {
             <div className="mb-6">
               <div className="relative">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                  <span className="text-neutral-500 text-lg">$</span>
+                  <span className="text-neutral-500 text-lg">PKR</span>
                 </div>
                 <Input
                   type="number"
@@ -105,7 +106,7 @@ export const ReceivePayment: React.FC = () => {
               <div className="mt-2 flex items-center justify-between text-sm">
                 <div className="text-neutral-500">Fee: 0.5%</div>
                 <div className="text-neutral-500">
-                  You'll receive: ${amount ? (parseFloat(amount) * 0.995).toFixed(2) : "0.00"}
+                  You'll receive: {amount ? formatCurrency(parseFloat(amount) * 0.995) : formatCurrency(0)}
                 </div>
               </div>
             </div>
@@ -123,7 +124,7 @@ export const ReceivePayment: React.FC = () => {
         {step === "method" && (
           <div>
             <h2 className="text-xl font-semibold mb-2">Choose Payment Method</h2>
-            <p className="text-neutral-600 mb-6">How would you like to receive ${amount}?</p>
+            <p className="text-neutral-600 mb-6">How would you like to receive {formatCurrency(parseFloat(amount))}?</p>
             
             <Tabs defaultValue="nfc" className="mb-6">
               <TabsList className="grid grid-cols-2 mb-6">
@@ -226,7 +227,7 @@ export const ReceivePayment: React.FC = () => {
         {step === "nfc" && (
           <div>
             <h2 className="text-xl font-semibold mb-2">NFC Payment</h2>
-            <p className="text-neutral-600 mb-6">Receiving ${amount}</p>
+            <p className="text-neutral-600 mb-6">Receiving {formatCurrency(parseFloat(amount))}</p>
             
             <Card>
               <CardContent className="pt-6">
@@ -325,7 +326,7 @@ export const ReceivePayment: React.FC = () => {
         {step === "ussd" && (
           <div>
             <h2 className="text-xl font-semibold mb-2">USSD Payment</h2>
-            <p className="text-neutral-600 mb-6">Receiving ${amount}</p>
+            <p className="text-neutral-600 mb-6">Receiving {formatCurrency(parseFloat(amount))}</p>
             
             <Card>
               <CardContent className="pt-6">
@@ -351,7 +352,7 @@ export const ReceivePayment: React.FC = () => {
                       <ol className="text-sm text-left list-decimal pl-5 space-y-1">
                         <li>Dial {ussdCode} on your phone</li>
                         <li>Select option 1 to pay</li>
-                        <li>Enter amount: ${amount}</li>
+                        <li>Enter amount: {formatCurrency(parseFloat(amount))}</li>
                         <li>Confirm payment with your PIN</li>
                       </ol>
                     </div>
@@ -399,19 +400,19 @@ export const ReceivePayment: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Amount Received</div>
-                    <div className="font-semibold">${amount}</div>
+                    <div className="font-semibold">{formatCurrency(parseFloat(amount))}</div>
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Transaction Fee (0.5%)</div>
-                    <div className="font-semibold">${(parseFloat(amount) * 0.005).toFixed(2)}</div>
+                    <div className="font-semibold">{formatCurrency(parseFloat(amount) * 0.005)}</div>
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Net Amount</div>
-                    <div className="font-semibold text-emerald-600">${(parseFloat(amount) * 0.995).toFixed(2)}</div>
+                    <div className="font-semibold text-emerald-600">{formatCurrency(parseFloat(amount) * 0.995)}</div>
                   </div>
                   <div className="flex justify-between py-2">
                     <div className="text-neutral-600">Payment Method</div>
-                    <div className="font-semibold">{step === "nfc" ? "NFC" : "USSD"}</div>
+                    <div className="font-semibold">{ussdCode ? "USSD" : "NFC"}</div>
                   </div>
                 </div>
               </CardContent>

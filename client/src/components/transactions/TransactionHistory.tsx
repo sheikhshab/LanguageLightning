@@ -9,6 +9,7 @@ import OfflineBanner from "@/components/shared/OfflineBanner";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Transaction } from "@shared/schema";
+import { formatCurrency } from "@/lib/paymentUtils";
 
 export const TransactionHistory: React.FC = () => {
   const [_, setLocation] = useLocation();
@@ -164,7 +165,7 @@ export const TransactionHistory: React.FC = () => {
                           </div>
                           <div className={transaction.type === "receive" ? "text-emerald-600" : "text-blue-600"}>
                             <span className="font-semibold">
-                              {transaction.type === "receive" ? "+" : "-"}${parseFloat(transaction.amount).toFixed(2)}
+                              {transaction.type === "receive" ? "+" : "-"}{formatCurrency(parseFloat(transaction.amount))}
                             </span>
                           </div>
                         </div>
@@ -182,7 +183,7 @@ export const TransactionHistory: React.FC = () => {
                             )}
                           </div>
                           <div>
-                            Fee: ${parseFloat(transaction.fee).toFixed(2)}
+                            Fee: {formatCurrency(parseFloat(transaction.fee))}
                           </div>
                         </div>
                       </div>

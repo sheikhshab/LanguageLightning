@@ -10,6 +10,7 @@ import BottomNavigation from "@/components/shared/BottomNavigation";
 import OfflineBanner from "@/components/shared/OfflineBanner";
 import PinInput from "@/components/shared/PinInput";
 import SecurityBadge from "@/components/shared/SecurityBadge";
+import { formatCurrency } from "@/lib/paymentUtils";
 
 export const SendPayment: React.FC = () => {
   const [_, setLocation] = useLocation();
@@ -139,20 +140,20 @@ export const SendPayment: React.FC = () => {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                    <span className="text-neutral-500 text-lg">$</span>
+                    <span className="text-neutral-500 text-lg">PKR</span>
                   </div>
                   <Input
                     type="number"
                     placeholder="0.00"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    className="pl-8 text-lg"
+                    className="pl-14 text-lg"
                   />
                 </div>
                 <div className="mt-1 flex justify-between text-xs text-neutral-500">
                   <span>Fee: 0.5%</span>
                   <span>
-                    Available Balance: ${user ? parseFloat(user.balance).toFixed(2) : "0.00"}
+                    Available Balance: {user ? formatCurrency(parseFloat(user.balance)) : formatCurrency(0)}
                   </span>
                 </div>
               </div>
@@ -199,16 +200,16 @@ export const SendPayment: React.FC = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Amount to Send</div>
-                    <div className="font-semibold">${amount}</div>
+                    <div className="font-semibold">{formatCurrency(parseFloat(amount))}</div>
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Transaction Fee (0.5%)</div>
-                    <div className="font-semibold">${(parseFloat(amount) * 0.005).toFixed(2)}</div>
+                    <div className="font-semibold">{formatCurrency(parseFloat(amount) * 0.005)}</div>
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Total Amount</div>
                     <div className="font-semibold text-blue-600">
-                      ${(parseFloat(amount) * 1.005).toFixed(2)}
+                      {formatCurrency(parseFloat(amount) * 1.005)}
                     </div>
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
@@ -254,7 +255,7 @@ export const SendPayment: React.FC = () => {
             <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
                 <div className="text-blue-700 font-medium">Transaction Amount</div>
-                <div className="text-blue-700 font-bold">${amount}</div>
+                <div className="text-blue-700 font-bold">{formatCurrency(parseFloat(amount))}</div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="text-blue-700 font-medium">Recipient</div>
@@ -316,16 +317,16 @@ export const SendPayment: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex justify-between py-2 border-b border-neutral-100">
                       <div className="text-neutral-600">Amount Sent</div>
-                      <div className="font-semibold">${amount}</div>
+                      <div className="font-semibold">{formatCurrency(parseFloat(amount))}</div>
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-100">
                       <div className="text-neutral-600">Transaction Fee</div>
-                      <div className="font-semibold">${(parseFloat(amount) * 0.005).toFixed(2)}</div>
+                      <div className="font-semibold">{formatCurrency(parseFloat(amount) * 0.005)}</div>
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-100">
                       <div className="text-neutral-600">Total Amount</div>
                       <div className="font-semibold text-blue-600">
-                        ${(parseFloat(amount) * 1.005).toFixed(2)}
+                        {formatCurrency(parseFloat(amount) * 1.005)}
                       </div>
                     </div>
                     <div className="flex justify-between py-2">
