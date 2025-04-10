@@ -451,7 +451,7 @@ export const SendPayment: React.FC = () => {
               <ul className="space-y-2">
                 {getNfcInstructions().map((instruction, index) => (
                   <li key={index} className="flex items-start text-sm text-neutral-600">
-                    <span className="bg-blue-100 text-blue-800 rounded-full h-5 w-5 flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">
+                    <span className="bg-[#5B8BF7]/10 text-[#5B8BF7] rounded-full h-5 w-5 flex items-center justify-center mr-2 flex-shrink-0 mt-0.5">
                       {index + 1}
                     </span>
                     {instruction}
@@ -500,8 +500,8 @@ export const SendPayment: React.FC = () => {
               <CardContent className="pt-6">
                 <div className="text-center mb-6">
                   {transactionSuccess ? (
-                    <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                      <Check className="h-8 w-8 text-emerald-600" />
+                    <div className="w-20 h-20 rounded-full bg-[#2ECC71]/10 flex items-center justify-center mx-auto mb-4">
+                      <Check className="h-8 w-8 text-[#2ECC71]" />
                     </div>
                   ) : (
                     <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -522,7 +522,7 @@ export const SendPayment: React.FC = () => {
                     </div>
                     <div className="flex justify-between py-2 border-b border-neutral-100">
                       <div className="text-neutral-600">Total Amount</div>
-                      <div className="font-semibold text-blue-600">
+                      <div className="font-semibold text-[#5B8BF7]">
                         {formatCurrency(parseFloat(amount) * 1.005)}
                       </div>
                     </div>

@@ -112,7 +112,7 @@ export const ReceivePayment: React.FC = () => {
             </div>
             
             <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600 py-6"
+              className="w-full bg-gradient-primary hover:opacity-90 py-6"
               onClick={handleAmountSubmit}
               disabled={!amount || parseFloat(amount) <= 0}
             >
@@ -164,7 +164,7 @@ export const ReceivePayment: React.FC = () => {
                     </div>
                     
                     <Button 
-                      className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                      className="w-full bg-gradient-primary hover:opacity-90"
                       onClick={handleNfcSelected}
                     >
                       Start NFC Payment
@@ -204,7 +204,7 @@ export const ReceivePayment: React.FC = () => {
                     </div>
                     
                     <Button 
-                      className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                      className="w-full bg-gradient-primary hover:opacity-90"
                       onClick={handleUssdSelected}
                       disabled={isLoading}
                     >
@@ -275,7 +275,7 @@ export const ReceivePayment: React.FC = () => {
                 
                 {nfcStatus === "waiting" && (
                   <Button 
-                    className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                    className="w-full bg-gradient-primary hover:opacity-90"
                     onClick={simulateNfcProcess}
                   >
                     Simulate NFC Payment
@@ -295,7 +295,7 @@ export const ReceivePayment: React.FC = () => {
                 
                 {nfcStatus === "success" && (
                   <Button 
-                    className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                    className="w-full bg-gradient-primary hover:opacity-90"
                     onClick={() => setStep("confirmation")}
                   >
                     View Details
