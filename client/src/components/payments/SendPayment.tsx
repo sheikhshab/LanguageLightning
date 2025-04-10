@@ -277,7 +277,7 @@ export const SendPayment: React.FC = () => {
             </div>
             
             <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+              className="w-full bg-gradient-primary hover:opacity-90"
               onClick={handleNext}
             >
               Continue
@@ -349,7 +349,7 @@ export const SendPayment: React.FC = () => {
                 Edit
               </Button>
               <Button 
-                className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                className="bg-gradient-primary hover:opacity-90"
                 onClick={handleNext}
               >
                 Confirm
@@ -363,14 +363,14 @@ export const SendPayment: React.FC = () => {
             <h2 className="text-xl font-semibold mb-2">Enter PIN</h2>
             <p className="text-neutral-600 mb-6">Enter your 4-digit security PIN to authorize this transaction</p>
             
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+            <div className="bg-[#5B8BF7]/10 border border-[#5B8BF7]/20 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-blue-700 font-medium">Transaction Amount</div>
-                <div className="text-blue-700 font-bold">{formatCurrency(parseFloat(amount))}</div>
+                <div className="text-[#5B8BF7] font-medium">Transaction Amount</div>
+                <div className="text-[#5B8BF7] font-bold">{formatCurrency(parseFloat(amount))}</div>
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-blue-700 font-medium">Recipient</div>
-                <div className="text-blue-700 font-medium">{receiverInfo}</div>
+                <div className="text-[#5B8BF7] font-medium">Recipient</div>
+                <div className="text-[#5B8BF7] font-medium">{receiverInfo}</div>
               </div>
             </div>
             
@@ -383,7 +383,7 @@ export const SendPayment: React.FC = () => {
             </div>
             
             <Button 
-              className="w-full bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+              className="w-full bg-gradient-primary hover:opacity-90"
               onClick={handleNext}
               disabled={isLoading}
             >
@@ -406,14 +406,14 @@ export const SendPayment: React.FC = () => {
               Hold your phone close to the recipient's device
             </p>
             
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
+            <div className="bg-[#5B8BF7]/10 border border-[#5B8BF7]/20 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-blue-700 font-medium">Transaction Amount</div>
-                <div className="text-blue-700 font-bold">{formatCurrency(parseFloat(amount))}</div>
+                <div className="text-[#5B8BF7] font-medium">Transaction Amount</div>
+                <div className="text-[#5B8BF7] font-bold">{formatCurrency(parseFloat(amount))}</div>
               </div>
               <div className="flex items-center justify-between">
-                <div className="text-blue-700 font-medium">Recipient</div>
-                <div className="text-blue-700 font-medium">{receiverInfo}</div>
+                <div className="text-[#5B8BF7] font-medium">Recipient</div>
+                <div className="text-[#5B8BF7] font-medium">{receiverInfo}</div>
               </div>
             </div>
             
@@ -424,21 +424,21 @@ export const SendPayment: React.FC = () => {
               
               <div className="mt-6 relative h-10">
                 {nfcStatus === "scanning" && (
-                  <div className="animate-pulse text-blue-600 flex items-center justify-center">
+                  <div className="animate-pulse text-[#5B8BF7] flex items-center justify-center">
                     <Smartphone className="mr-2 h-5 w-5" />
                     Scanning for device...
                   </div>
                 )}
                 
                 {nfcStatus === "connecting" && (
-                  <div className="text-amber-600 flex items-center justify-center">
+                  <div className="text-[#FFC107] flex items-center justify-center">
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Connecting to device...
                   </div>
                 )}
                 
                 {nfcStatus === "processing" && (
-                  <div className="text-emerald-600 flex items-center justify-center">
+                  <div className="text-[#2ECC71] flex items-center justify-center">
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                     Processing payment...
                   </div>
@@ -468,7 +468,7 @@ export const SendPayment: React.FC = () => {
                 Cancel
               </Button>
               <Button 
-                className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                className="bg-gradient-primary hover:opacity-90"
                 onClick={handleNfcPayment}
                 disabled={isLoading}
               >
@@ -540,13 +540,13 @@ export const SendPayment: React.FC = () => {
                 <>
                   <Button 
                     variant="outline"
-                    className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                    className="border-[#5B8BF7]/20 bg-[#5B8BF7]/10 text-[#5B8BF7] hover:bg-[#5B8BF7]/20"
                     onClick={() => setLocation("/transaction-history")}
                   >
                     View History
                   </Button>
                   <Button 
-                    className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                    className="bg-gradient-primary hover:opacity-90"
                     onClick={() => setLocation("/dashboard")}
                   >
                     Back to Home
@@ -561,7 +561,7 @@ export const SendPayment: React.FC = () => {
                     Cancel
                   </Button>
                   <Button 
-                    className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                    className="bg-gradient-primary hover:opacity-90"
                     onClick={() => setStep("details")}
                   >
                     Try Again
