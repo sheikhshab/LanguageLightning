@@ -234,8 +234,8 @@ export const ReceivePayment: React.FC = () => {
                 <div className="text-center mb-6">
                   {nfcStatus === "waiting" && (
                     <>
-                      <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                        <Smartphone className="h-10 w-10 text-blue-600" />
+                      <div className="w-24 h-24 rounded-full bg-[#5B8BF7]/10 flex items-center justify-center mx-auto mb-4">
+                        <Smartphone className="h-10 w-10 text-[#5B8BF7]" />
                       </div>
                       <h3 className="text-lg font-semibold mb-1">Ready to Scan</h3>
                       <p className="text-neutral-500 mb-4">Tap customer's card or phone to your device</p>
@@ -244,8 +244,8 @@ export const ReceivePayment: React.FC = () => {
                   
                   {nfcStatus === "connecting" && (
                     <>
-                      <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
+                      <div className="w-24 h-24 rounded-full bg-[#5B8BF7]/10 flex items-center justify-center mx-auto mb-4">
+                        <Loader2 className="h-10 w-10 text-[#5B8BF7] animate-spin" />
                       </div>
                       <h3 className="text-lg font-semibold mb-1">Processing</h3>
                       <p className="text-neutral-500 mb-4">Keep devices close together...</p>
@@ -254,8 +254,8 @@ export const ReceivePayment: React.FC = () => {
                   
                   {nfcStatus === "success" && (
                     <>
-                      <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                        <Check className="h-10 w-10 text-emerald-600" />
+                      <div className="w-24 h-24 rounded-full bg-[#2ECC71]/10 flex items-center justify-center mx-auto mb-4">
+                        <Check className="h-10 w-10 text-[#2ECC71]" />
                       </div>
                       <h3 className="text-lg font-semibold mb-1">Payment Successful!</h3>
                       <p className="text-neutral-500 mb-4">Transaction completed</p>
@@ -264,8 +264,8 @@ export const ReceivePayment: React.FC = () => {
                   
                   {nfcStatus === "error" && (
                     <>
-                      <div className="w-24 h-24 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                        <PhoneCall className="h-10 w-10 text-red-600" />
+                      <div className="w-24 h-24 rounded-full bg-[#E74C3C]/10 flex items-center justify-center mx-auto mb-4">
+                        <PhoneCall className="h-10 w-10 text-[#E74C3C]" />
                       </div>
                       <h3 className="text-lg font-semibold mb-1">Payment Failed</h3>
                       <p className="text-neutral-500 mb-4">Please try again or use USSD</p>
@@ -305,13 +305,14 @@ export const ReceivePayment: React.FC = () => {
                 {nfcStatus === "error" && (
                   <div className="grid grid-cols-2 gap-3">
                     <Button 
-                      variant="outline" 
+                      variant="outline"
+                      className="border-[#5B8BF7]/20 hover:bg-[#5B8BF7]/5"
                       onClick={() => setNfcStatus("waiting")}
                     >
                       Try Again
                     </Button>
                     <Button 
-                      className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                      className="bg-gradient-primary hover:opacity-90"
                       onClick={() => setStep("method")}
                     >
                       Change Method
@@ -332,14 +333,14 @@ export const ReceivePayment: React.FC = () => {
               <CardContent className="pt-6">
                 {ussdCode ? (
                   <div className="text-center mb-6">
-                    <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                      <PhoneCall className="h-10 w-10 text-blue-600" />
+                    <div className="w-24 h-24 rounded-full bg-[#5B8BF7]/10 flex items-center justify-center mx-auto mb-4">
+                      <PhoneCall className="h-10 w-10 text-[#5B8BF7]" />
                     </div>
                     
                     <h3 className="text-lg font-semibold mb-4">USSD Code Generated</h3>
                     
-                    <div className="bg-neutral-100 p-3 rounded-md mb-4">
-                      <p className="text-xl font-mono font-bold">{ussdCode}</p>
+                    <div className="bg-[#5B8BF7]/5 border border-[#5B8BF7]/20 p-3 rounded-md mb-4">
+                      <p className="text-xl font-mono font-bold text-[#5B8BF7]">{ussdCode}</p>
                     </div>
                     
                     <div className="text-sm text-neutral-600 mb-4">
@@ -347,8 +348,8 @@ export const ReceivePayment: React.FC = () => {
                       <p>Code expires in {ussdExpiry}</p>
                     </div>
                     
-                    <div className="border border-neutral-200 rounded-md p-3 mb-4">
-                      <p className="font-medium mb-1">Customer Instructions:</p>
+                    <div className="border border-[#5B8BF7]/20 rounded-md p-3 mb-4 bg-[#F8FAFF]">
+                      <p className="font-medium mb-1 text-[#5B8BF7]">Customer Instructions:</p>
                       <ol className="text-sm text-left list-decimal pl-5 space-y-1">
                         <li>Dial {ussdCode} on your phone</li>
                         <li>Select option 1 to pay</li>
@@ -366,13 +367,14 @@ export const ReceivePayment: React.FC = () => {
                 
                 <div className="grid grid-cols-2 gap-3">
                   <Button 
-                    variant="outline" 
+                    variant="outline"
+                    className="border-[#5B8BF7]/20 hover:bg-[#5B8BF7]/5"
                     onClick={() => setStep("method")}
                   >
                     Cancel
                   </Button>
                   <Button 
-                    className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                    className="bg-gradient-primary hover:opacity-90"
                     onClick={() => setStep("confirmation")}
                     disabled={!ussdCode}
                   >
@@ -392,8 +394,8 @@ export const ReceivePayment: React.FC = () => {
             <Card className="mb-6">
               <CardContent className="pt-6">
                 <div className="text-center mb-6">
-                  <div className="w-20 h-20 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                    <Check className="h-8 w-8 text-emerald-600" />
+                  <div className="w-20 h-20 rounded-full bg-[#2ECC71]/10 flex items-center justify-center mx-auto mb-4">
+                    <Check className="h-8 w-8 text-[#2ECC71]" />
                   </div>
                 </div>
                 
@@ -408,7 +410,7 @@ export const ReceivePayment: React.FC = () => {
                   </div>
                   <div className="flex justify-between py-2 border-b border-neutral-100">
                     <div className="text-neutral-600">Net Amount</div>
-                    <div className="font-semibold text-emerald-600">{formatCurrency(parseFloat(amount) * 0.995)}</div>
+                    <div className="font-semibold text-[#2ECC71]">{formatCurrency(parseFloat(amount) * 0.995)}</div>
                   </div>
                   <div className="flex justify-between py-2">
                     <div className="text-neutral-600">Payment Method</div>
@@ -421,13 +423,13 @@ export const ReceivePayment: React.FC = () => {
             <div className="grid grid-cols-2 gap-3">
               <Button 
                 variant="outline"
-                className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100"
+                className="border-[#5B8BF7]/20 bg-[#5B8BF7]/5 text-[#5B8BF7] hover:bg-[#5B8BF7]/10"
                 onClick={() => setLocation("/transaction-history")}
               >
                 View History
               </Button>
               <Button 
-                className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
+                className="bg-gradient-primary hover:opacity-90"
                 onClick={() => setLocation("/dashboard")}
               >
                 Back to Home
