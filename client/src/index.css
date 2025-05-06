@@ -4,34 +4,56 @@
 
 @layer base {
   :root {
-    --background: 204 75% 65%; /* #63B1E7 */
-    --foreground: 0 0% 0%; /* Black */
+    /* Circular Color Palette */
+    --background: 0 0% 0%; /* Black */
+    --foreground: 204 75% 65%; /* #63B1E7 */
 
-    --card: 204 75% 65%; /* #63B1E7 */
-    --card-foreground: 0 0% 0%; /* Black */
+    --card: 0 0% 0%; /* Black */
+    --card-foreground: 222 31% 8%; /* #0C121F */
 
-    --popover: 204 75% 65%; /* #63B1E7 */
-    --popover-foreground: 0 0% 0%; /* Black */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 31% 8%; /* #0C121F */
 
-    --primary: 0 0% 0%; /* Black */
+    --primary: 220 90% 66%; /* #5B8BF7 */
     --primary-foreground: 0 0% 100%;
+
+    --secondary: 145 68% 49%; /* #2ECC71 */
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 222 3% 56%; /* #8A8D91 */
+    --muted-foreground: 215 5% 65%;
+
+    --accent: 191 100% 50%; /* #00D8FF */
+    --accent-foreground: 222 31% 8%; /* #0C121F */
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214 10% 90%;
     --input: 214 10% 90%;
-    --ring: 0 0% 0%; /* Black */
+    --ring: 220 90% 66%; /* #5B8BF7 */
+
+    --success: 145 68% 49%; /* #2ECC71 */
+    --warning: 43 100% 50%; /* #FFC107 */
 
     --radius: 0.75rem;
   }
 
   .dark {
-    --background: 204 75% 65%; /* #63B1E7 */
-    --foreground: 0 0% 0%; /* Black */
+    --background: 0 0% 0%; /* Black */
+    --foreground: 204 75% 65%; /* #63B1E7 */
+
+    --card: 0 0% 0%; /* Black */
+    --card-foreground: 0 0% 100%;
+
+    --popover: 0 0% 0%; /* Black */
+    --popover-foreground: 0 0% 100%;
 
     --primary: 204 75% 65%; /* #63B1E7 */
     --primary-foreground: 0 0% 100%;
+
+    --secondary: 145 68% 49%; /* #2ECC71 */
+    --secondary-foreground: 0 0% 100%;
 
     --muted: 222 3% 56%; /* #8A8D91 */
     --muted-foreground: 215 5% 75%;
@@ -41,11 +63,13 @@
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
-    
+
     --border: 222 15% 20%;
     --input: 222 15% 20%;
-    --ring: 204 75% 65%; /* #63B1E7 */
+    --ring: 220 90% 66%; /* #5B8BF7 */
 
+    --success: 145 68% 49%; /* #2ECC71 */
+    --warning: 43 100% 50%; /* #FFC107 */
   }
 }
 
