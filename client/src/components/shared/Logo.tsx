@@ -3,14 +3,20 @@ import React from "react";
 export const Logo: React.FC<{ className?: string }> = ({ className = "" }) => {
   return (
     <svg 
-      className={className}
-      viewBox="0 0 120 120" 
+      width="100" height="100" viewBox="0 0 100 100" 
       fill="none" 
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
     >
-      <circle cx="60" cy="60" r="55" stroke="currentColor" strokeWidth="3"/>
-      <path d="M40 60C40 48.954 48.954 40 60 40C71.046 40 80 48.954 80 60C80 71.046 71.046 80 60 80" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
-      <path d="M60 80L45 65L60 50" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <rect width="100" height="100" fill="black" />
+      <g transform="translate(20,20)">
+        <rect x="5" width="50" height="7" rx="3.5" fill="#63B1E7"/>
+        <rect x="5" y="12" width="40" height="7" rx="3.5" fill="#63B1E7"/>
+        <rect x="5" y="24" width="30" height="7" rx="3.5" fill="#63B1E7"/>
+        <rect x="5" y="36" width="45" height="7" rx="3.5" fill="#63B1E7"/>
+        <rect x="5" y="48" width="55" height="7" rx="3.5" fill="#63B1E7"/>
+        <rect x="5" y="60" width="40" height="7" rx="3.5" fill="#63B1E7"/>
+      </g>
     </svg>
   );
 };
