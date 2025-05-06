@@ -5,10 +5,15 @@
 @layer base {
   :root {
     /* Circular Color Palette */
-    --background: 0 0% 0%; /* Black */
-    --foreground: 204 75% 65%; /* #63B1E7 */
+    /* Primary: #5B8BF7 (Blue) */
+    /* Secondary: #2ECC71 (Green), #8A8D91 (Gray) */
+    /* Dark: #0C121F (Dark Blue) */
+    /* Accent: #00D8FF (Cyan), #FFC107 (Amber) */
 
-    --card: 0 0% 0%; /* Black */
+    --background: 0 0% 100%;
+    --foreground: 222 31% 8%; /* #0C121F */
+
+    --card: 0 0% 100%;
     --card-foreground: 222 31% 8%; /* #0C121F */
 
     --popover: 0 0% 100%;
@@ -40,16 +45,16 @@
   }
 
   .dark {
-    --background: 0 0% 0%; /* Black */
-    --foreground: 204 75% 65%; /* #63B1E7 */
+    --background: 222 31% 8%; /* #0C121F */
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 0%; /* Black */
+    --card: 222 31% 8%; /* #0C121F */
     --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 0%; /* Black */
+    --popover: 222 31% 8%; /* #0C121F */
     --popover-foreground: 0 0% 100%;
 
-    --primary: 204 75% 65%; /* #63B1E7 */
+    --primary: 220 90% 66%; /* #5B8BF7 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 145 68% 49%; /* #2ECC71 */
@@ -81,6 +86,68 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+/* Custom gradient backgrounds using Circular palette */
+.bg-gradient-primary {
+  @apply bg-gradient-to-r from-[#5B8BF7] to-[#00D8FF];
+}
+
+.bg-gradient-secondary {
+  @apply bg-gradient-to-r from-[#2ECC71] to-[#00D8FF];
+}
+
+.bg-gradient-accent {
+  @apply bg-gradient-to-r from-[#5B8BF7] to-[#FFC107];
+}
+
+/* Circular palette colors as utility classes */
+.bg-circular-primary {
+  @apply bg-[#5B8BF7];
+}
+
+.bg-circular-secondary-green {
+  @apply bg-[#2ECC71];
+}
+
+.bg-circular-secondary-gray {
+  @apply bg-[#8A8D91];
+}
+
+.bg-circular-dark {
+  @apply bg-[#0C121F];
+}
+
+.bg-circular-accent-cyan {
+  @apply bg-[#00D8FF];
+}
+
+.bg-circular-accent-amber {
+  @apply bg-[#FFC107];
+}
+
+.text-circular-primary {
+  @apply text-[#5B8BF7];
+}
+
+.text-circular-secondary-green {
+  @apply text-[#2ECC71];
+}
+
+.text-circular-secondary-gray {
+  @apply text-[#8A8D91];
+}
+
+.text-circular-dark {
+  @apply text-[#0C121F];
+}
+
+.text-circular-accent-cyan {
+  @apply text-[#00D8FF];
+}
+
+.text-circular-accent-amber {
+  @apply text-[#FFC107];
 }
 
 /* NFC animation */
